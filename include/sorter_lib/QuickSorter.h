@@ -20,15 +20,14 @@ int QuickSorter<T>::Partition(Sequence<T>* seq, int low, int high) {
     T pivot = seq->Get(high);
     int i = low - 1;
 
-    for (int j = low; j <= high; j++) {
-        if (seq->Get(j) <= pivot) {
+    for (int j = low; j < high; j++) {
+        if (seq->Get(j) < pivot) {
             i++;
             T temp = seq->Get(i);
             seq->Set(i, seq->Get(j));
             seq->Set(j, temp);
         }
     }
-
 
     T temp = seq->Get(i + 1);
     seq->Set(i + 1, seq->Get(high));
