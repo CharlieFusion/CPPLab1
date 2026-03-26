@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <ctime>
+#include "random"
 #include "../include/sequence_lib/ArraySequence.h"
 #include "../include/sequence_lib/ListSequence.h"
 #include "../include/sorter_lib/ISorter.h"
@@ -23,6 +24,29 @@ T get_input(T default_value) {
     return default_value;
 }
 
+Sequence<int>* generateSequence(Sequence<int>* seq, int length, int type) {
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist(1,100);
+
+    if (type == 1) {
+        seq->Append(dist(rng));
+        for (int i = 1; i < length; i++) {
+            seq->Append(seq->Get(i-1) + dist(rng));
+        }
+    } else if (type == 2) {
+        for (int i = 0; i < length; i++) {
+            seq->Append(dist(rng));
+        }
+    } else if (type == 3) {
+        seq->Append(dist(rng));
+        for (int i = 1; i < length; i++) {
+            seq->Append(seq->Get(i-1) - dist(rng));
+        }
+    }
+
+    return seq;
+}
 
 ArraySequence<int> menu() {
     ArraySequence<int> menu_values;
@@ -126,7 +150,24 @@ int main() {
     CocktailSorter<int> cSort;
 
     if (menu_values.Get(0) == 1) {
-        // TODO: Automatic Creation
+        int test_leng = menu_values.Get(1);
+        if (menu_values.Get(1) == -1) {
+            test_leng = 10000;
+        }
+
+        generateSequence(&list, test_leng, menu_values.Get(2));
+        generateSequence(&array, test_leng, menu_values.Get(2));
+
+        std::cout << "The initial sequences: " << std::endl << "Array: ";
+        for (int i = 0; i < array.GetLength(); i++) {
+            std::cout << array.Get(i) << " ";
+        }
+        std::cout << std::endl << "List: ";
+        for (int i = 0; i < list.GetLength(); i++) {
+            std::cout << list.Get(i) << " ";
+        }
+        std::cout << std::endl;
+
     } else {
         std::cout << "Start writing sequence elements. Write ~ for end of sequence:" << std::endl;
         std::string input;
@@ -147,6 +188,12 @@ int main() {
                 std::cout << "You can only write numbers or symbol ~ for stop end of sequence" << std::endl;
             }
         }
+
+        std::cout << "The entered sequence: ";
+        for (int i = 0; i < array.GetLength(); i++) {
+            std::cout << array.Get(i) << " ";
+        }
+        std::cout << std::endl;
     }
 
     if (menu_values.Get(3) < 5) {
@@ -158,17 +205,17 @@ int main() {
         }
 
         std::cout << "Results for " << sorter->GetName() << " Array: " << std::endl;
-        sort_analyzer(sorter, &array, menu_values.Get(3) == 2);
+        sort_analyzer(sorter, &array, menu_values.Get(3) % 2 == 0);
 
         std::cout << "Results for " << sorter->GetName() << " List: " << std::endl;
-        sort_analyzer(sorter, &list, menu_values.Get(3) == 2);
+        sort_analyzer(sorter, &list, menu_values.Get(3) % 2 == 0);
     } else {
         std::cout << "Results for Quick Sort: " << std::endl;
-        sort_analyzer(&qSort, &array, menu_values.Get(3) == 2);
-        sort_analyzer(&qSort, &list, menu_values.Get(3) == 2);
-        std::cout << "Results for Cocktail Sort: " << std::endl;
-        sort_analyzer(&cSort, &array, menu_values.Get(3) == 2);
-        sort_analyzer(&cSort, &list, menu_values.Get(3) == 2);
+        sort_analyzer(&qSort, &array, true);
+        sort_analyzer(&qSort, &list, true);
+        std::cout << std::endl << "Results for Cocktail Sort: " << std::endl;
+        sort_analyzer(&cSort, &array, true);
+        sort_analyzer(&cSort, &list, true);
     }
 
 
